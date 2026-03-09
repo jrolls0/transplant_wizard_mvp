@@ -1,0 +1,35 @@
+model = "gpt-5.4"
+model_provider = "openai"
+model_reasoning_effort = "high"
+plan_mode_reasoning_effort = "xhigh"
+review_model = "gpt-5.4"
+
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "cached"
+
+[sandbox_workspace_write]
+network_access = false
+
+[features]
+multi_agent = true
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.planner]
+description = "Creates implementation plans before coding. Use before implementing any feature to break down requirements, identify dependencies, and propose a scoped approach tied to ACTIVE_PLAN.md."
+config_file = "../agents/planner.toml"
+
+[agents.reviewer]
+description = "Reviews code for workflow compliance, hard gate preservation, regressions, quality, security, and UX alignment. Suggests LEARNINGS.md updates when patterns emerge."
+config_file = "../agents/reviewer.toml"
+
+[agents.database-architect]
+description = "Designs schema, migrations, indexes, and RLS strategy for Supabase. Creates ADRs for significant schema decisions."
+config_file = "../agents/database-architect.toml"
+
+[agents.tester]
+description = "Writes automated tests for workflow rules, hard gates, auth/access behavior, and targeted critical-path E2E coverage. Focuses on high-value tests, not broad noisy coverage."
+config_file = "../agents/tester.toml"

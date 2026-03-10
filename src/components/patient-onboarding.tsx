@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 import {
@@ -26,220 +27,379 @@ type ConsentSection = {
   numbered?: Array<{ label: string; text: string }>;
 };
 
-const stepLabels = {
-  complete: "Complete",
-  "link-required": "Sign in",
-  "roi-form-1": "ROI Form 1",
-  "roi-form-2": "ROI Form 2",
-  welcome: "Welcome",
-} as const;
+type IconProps = {
+  className?: string;
+};
 
-const roiForm1Sections: ConsentSection[] = [
+const SERVICES_CONSENT_SECTIONS: ConsentSection[] = [
   {
-    heading: "Purpose of This Authorization",
+    heading: "INTRODUCTION",
     paragraphs: [
-      "Transplant Wizard and the transplant program use this authorization to request, review, and share the medical information needed to continue your kidney transplant intake.",
-      "This authorization supports communication between your dialysis clinic, social worker, nephrologist, and transplant center so your referral can move forward without delay.",
+      'This document constitutes an agreement between you (the "Patient") and Transplant Wizard, LLC ("Transplant Wizard," "we," "us," or "our") regarding the use of our transplant coordination and referral services.',
     ],
   },
   {
-    heading: "Information That May Be Requested",
+    heading: "DESCRIPTION OF SERVICES",
+    paragraphs: [
+      "Transplant Wizard provides a digital platform designed to assist patients in navigating the kidney transplant referral process. Our services include:",
+    ],
     bullets: [
-      "Dialysis treatment records and social work documentation",
-      "Laboratory results, imaging, and referral notes",
-      "Insurance and transplant-evaluation records needed for intake",
+      "Facilitating communication between patients, dialysis social workers, and transplant centers",
+      "Secure document collection and transmission",
+      "Transplant center selection assistance",
+      "Care coordination and progress tracking",
+      "Educational resources about the transplant process",
     ],
   },
   {
-    heading: "Your Rights",
-    checkItems: [
-      "You may request a copy of this authorization for your records.",
-      "You may revoke this authorization in writing according to transplant-center policy.",
-      "Revoking this authorization may limit how quickly the program can continue your intake.",
-    ],
-  },
-];
-
-const roiForm2Sections: ConsentSection[] = [
-  {
-    heading: "Protected Health Information Authorization",
+    heading: "IMPORTANT DISCLAIMERS",
     paragraphs: [
-      "This authorization allows the transplant program to use and disclose protected health information needed to complete your intake review and coordinate next steps.",
-      "The information may include clinical history, specialist notes, referral summaries, insurance details, and other records required for transplant evaluation.",
+      "By using Transplant Wizard services, you acknowledge and understand that:",
     ],
-  },
-  {
-    heading: "Who May Receive This Information",
     numbered: [
       {
         label: "1.",
-        text: "Members of the transplant center involved in intake and evaluation.",
+        text: "Transplant Wizard does NOT provide medical advice, diagnosis, or treatment. We are a coordination service only.",
       },
       {
         label: "2.",
-        text: "Your dialysis clinic team and nephrology care team when coordination is required.",
+        text: "All medical decisions regarding your transplant care should be made in consultation with your healthcare providers.",
       },
       {
         label: "3.",
-        text: "Authorized operational staff supporting scheduling, records follow-up, and intake progression.",
+        text: "Use of our services does not guarantee acceptance by any transplant center or placement on a transplant waiting list.",
+      },
+      {
+        label: "4.",
+        text: "You remain responsible for attending appointments and complying with transplant center requirements.",
       },
     ],
   },
   {
-    heading: "Important Notes",
+    heading: "DATA SECURITY",
+    paragraphs: [
+      "We are committed to protecting your personal health information in accordance with the Health Insurance Portability and Accountability Act (HIPAA) and applicable state laws. Your information is encrypted, securely stored, and only shared with authorized parties as specified in the Medical Records Consent Form.",
+    ],
+  },
+  {
+    heading: "VOLUNTARY PARTICIPATION",
+    paragraphs: [
+      "Your participation in Transplant Wizard services is entirely voluntary. You may withdraw your consent and discontinue use of our services at any time by contacting us at support@transplantwizard.com. Withdrawal will not affect your eligibility for transplant evaluation through other means.",
+    ],
+  },
+  {
+    heading: "CONSENT ACKNOWLEDGMENT",
+    paragraphs: ["By signing below, I acknowledge that:"],
     checkItems: [
-      "This milestone covers only onboarding and consent collection.",
-      "After this form is signed, your case advances to the next intake stage.",
-      "A transplant team member will contact you with the next required steps.",
+      "I have read and understand this consent form",
+      "I voluntarily agree to use Transplant Wizard services",
+      "I understand that Transplant Wizard does not provide medical advice",
+      "I agree to the terms and conditions outlined above",
     ],
   },
 ];
 
-function PatientBackground({ children }: { children: ReactNode }) {
+const MEDICAL_CONSENT_SECTIONS: ConsentSection[] = [
+  {
+    heading: "PURPOSE OF AUTHORIZATION",
+    paragraphs: [
+      "I hereby authorize the use and/or disclosure of my individually identifiable health information as described below. This authorization is made in compliance with the Health Insurance Portability and Accountability Act of 1996 (HIPAA) Privacy Rule.",
+    ],
+  },
+  {
+    heading: "INFORMATION TO BE DISCLOSED",
+    paragraphs: [
+      "I authorize the release of the following protected health information (PHI):",
+    ],
+    bullets: [
+      "Medical records related to kidney disease, dialysis treatment, and transplant evaluation",
+      "Laboratory results including blood tests, urinalysis, and tissue typing",
+      "Diagnostic imaging reports and results",
+      "Medication lists and pharmacy records",
+      "Clinical notes and physician summaries",
+      "Social work assessments and psychosocial evaluations",
+      "Insurance and financial clearance documentation",
+      "Immunization records",
+    ],
+  },
+  {
+    heading: "AUTHORIZED PARTIES",
+    paragraphs: [
+      "I authorize disclosure of my PHI to and from the following parties:",
+    ],
+    numbered: [
+      {
+        label: "1.",
+        text: "Transplant Centers: Selected transplant programs for evaluation and listing purposes",
+      },
+      {
+        label: "2.",
+        text: "Dialysis Unit Social Workers (DUSW): For care coordination and document management",
+      },
+      {
+        label: "3.",
+        text: "Healthcare Providers: Physicians, specialists, and care teams involved in my transplant evaluation",
+      },
+      {
+        label: "4.",
+        text: "Transplant Wizard: For secure transmission and coordination of medical information",
+      },
+    ],
+  },
+  {
+    heading: "DURATION OF AUTHORIZATION",
+    paragraphs: [
+      "This authorization shall remain in effect for a period of twenty-four (24) months from the date of signature, unless revoked earlier in writing by the patient or patient's legal representative.",
+    ],
+  },
+  {
+    heading: "RIGHT TO REVOKE",
+    paragraphs: [
+      "I understand that I have the right to revoke this authorization at any time by submitting a written request to Transplant Wizard at support@transplantwizard.com. I understand that revocation will not affect any actions taken in reliance on this authorization prior to receipt of my written revocation.",
+    ],
+  },
+  {
+    heading: "REDISCLOSURE NOTICE",
+    paragraphs: [
+      "I understand that once my health information is disclosed pursuant to this authorization, it may no longer be protected by federal privacy regulations and could potentially be redisclosed by the recipient.",
+    ],
+  },
+  {
+    heading: "VOLUNTARY AUTHORIZATION",
+    paragraphs: ["I understand that:"],
+    checkItems: [
+      "This authorization is voluntary",
+      "I may refuse to sign this authorization",
+      "My treatment will not be conditioned on signing this authorization",
+      "I am entitled to receive a copy of this signed authorization",
+    ],
+  },
+  {
+    heading: "ACKNOWLEDGMENT",
+    paragraphs: [
+      "By signing below, I certify that I have read and understand this Authorization for Release of Protected Health Information, and I voluntarily consent to the disclosure of my health information as described herein.",
+    ],
+  },
+];
+
+const SIMULATED_SIGNATURE_DATA_URL = `data:image/svg+xml;utf8,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="90" viewBox="0 0 320 90">
+     <rect width="320" height="90" fill="#f8fafc"/>
+     <path d="M22 64 C45 18, 80 86, 116 34 C133 12, 168 74, 205 30 C228 5, 267 78, 298 26" stroke="#111827" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+     <text x="24" y="83" font-size="11" fill="#64748b" font-family="Arial, sans-serif">/s/ Patient Signature</text>
+   </svg>`,
+)}`;
+
+function HeartIcon({ className }: IconProps) {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#f2f7ff] via-[#ecf3ff] to-[#e2edf8] text-slate-900">
-      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col">{children}</div>
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 20.4 4.8 13.7C3 12.1 2 10.7 2 8.8 2 6.1 4 4 6.7 4c1.5 0 3 .7 4 1.9C11.7 4.7 13.2 4 14.7 4 17.4 4 19.4 6.1 19.4 8.8c0 1.9-1 3.3-2.8 4.9L12 20.4Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function CrossIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 3v18M3 12h18"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M6 7.5h12M7.5 6v12M16.5 6v12M6 16.5h12"
+        opacity="0.18"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.2"
+      />
+    </svg>
+  );
+}
+
+function FileTextIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8 3.5h6.2L19 8.3V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 7 19V5A1.5 1.5 0 0 1 8.5 3.5Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+      <path
+        d="M14 3.8V8h4.2M9.5 11.2h5M9.5 14.2h5M9.5 17.2h3.4"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function UserIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 7.2c.7-2.9 3.1-4.7 6-4.7s5.3 1.8 6 4.7"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
+function MailIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 6.5h16v11H4zM4.5 7l7.5 6L19.5 7"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
+function BellIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8.5 17.2h7l-1-1.8V11a3.5 3.5 0 1 0-7 0v4.4l-1 1.8Zm2.6 2.3a1.4 1.4 0 0 0 2.8 0"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
+function PatientGradientBackground({ children }: { children: ReactNode }) {
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-[#f2f7ff] via-[#ecf3ff] to-[#e2edf8]">
+      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col">
+        {children}
+      </div>
     </main>
   );
 }
 
-function BrandMark({ large = false }: { large?: boolean }) {
+function EntryHero() {
   return (
-    <div
-      className={`flex items-center justify-center rounded-full bg-gradient-to-br from-[#3399e6] to-[#1f83d2] text-white shadow-[0_10px_24px_rgba(51,153,230,0.35)] ${
-        large ? "h-16 w-16 text-lg font-bold" : "h-11 w-11 text-sm font-semibold"
-      }`}
-    >
-      TW
-    </div>
-  );
-}
-
-function EntryShell({
-  body,
-  eyebrow,
-  footer,
-  hero,
-  title,
-}: {
-  body: ReactNode;
-  eyebrow: string;
-  footer?: ReactNode;
-  hero: ReactNode;
-  title: string;
-}) {
-  return (
-    <PatientBackground>
-      <div className="px-5 pb-6 pt-10">
-        <div className="mb-6 mt-2 text-center">
-          <div className="mx-auto mb-3">
-            <BrandMark large />
-          </div>
-          <h1 className="text-[2rem] font-bold leading-tight text-slate-900">
-            {title}
-          </h1>
-          <p className="mt-1 text-sm leading-relaxed text-slate-500">{eyebrow}</p>
-          <div className="mt-3 text-sm leading-relaxed text-slate-600">{hero}</div>
-        </div>
-
-        <div className="rounded-[28px] bg-white/95 p-4 shadow-[0_20px_40px_rgba(15,23,42,0.11)]">
-          {body}
-        </div>
-
-        {footer ? <div className="mt-4 px-1">{footer}</div> : null}
+    <div className="mb-7 mt-3 flex flex-col items-center gap-3 text-center">
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#3399e6] shadow-[0_10px_24px_rgba(51,153,230,0.35)]">
+        <HeartIcon className="h-10 w-10 text-white" />
       </div>
-    </PatientBackground>
+      <div>
+        <h1 className="text-[31px] font-bold tracking-tight text-slate-900">
+          Patient Portal
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          Your journey to a new beginning
+        </p>
+      </div>
+    </div>
   );
 }
 
 function EntryTabs({ activeTab }: { activeTab: EntryTab }) {
   return (
-    <div className="mb-4 flex rounded-2xl bg-[#eff4fa] p-1">
-      <div
-        className={`flex-1 rounded-xl px-4 py-2 text-center text-sm font-semibold transition ${
-          activeTab === "login" ? "bg-[#3399e6] text-white" : "text-slate-500"
-        }`}
-      >
-        Login
-      </div>
-      <div
-        className={`flex-1 rounded-xl px-4 py-2 text-center text-sm font-semibold transition ${
-          activeTab === "register" ? "bg-[#3399e6] text-white" : "text-slate-500"
-        }`}
-      >
-        Register
+    <div className="mb-4 rounded-full bg-white p-1 shadow-[0_8px_18px_rgba(15,23,42,0.08)]">
+      <div className="grid grid-cols-2 gap-1">
+        <div
+          className={`rounded-full px-4 py-2.5 text-center text-sm font-semibold transition ${
+            activeTab === "login" ? "bg-[#3399e6] text-white" : "text-slate-500"
+          }`}
+        >
+          Sign In
+        </div>
+        <div
+          className={`rounded-full px-4 py-2.5 text-center text-sm font-semibold transition ${
+            activeTab === "register"
+              ? "bg-[#3399e6] text-white"
+              : "text-slate-500"
+          }`}
+        >
+          Register
+        </div>
       </div>
     </div>
   );
 }
 
-function ProgressHeader({
-  caseNumber,
-  currentStep,
-}: {
-  caseNumber: string;
-  currentStep: PatientOnboardingStep;
-}) {
-  const orderedSteps = ["welcome", "roi-form-1", "roi-form-2", "complete"] as const;
-  const currentIndex = orderedSteps.indexOf(
-    currentStep === "link-required" ? "welcome" : currentStep,
-  );
-
+function EntryCard({ children }: { children: ReactNode }) {
   return (
-    <div className="mb-4 rounded-2xl bg-[#f4f8fd] px-4 py-4">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#3380cc]">
-            Case {caseNumber}
-          </p>
-          <p className="mt-1 text-sm text-slate-600">
-            {currentStep === "complete"
-              ? "Onboarding finished"
-              : `${stepLabels[currentStep]} step`}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {orderedSteps.map((step, index) => {
-            const isActive = currentStep === step;
-            const isComplete = currentStep === "complete" || index < currentIndex;
-
-            return (
-              <span
-                key={step}
-                className={`h-2.5 w-9 rounded-full transition ${
-                  isComplete
-                    ? "bg-[#3399e6]"
-                    : isActive
-                      ? "bg-[#8cc7f3]"
-                      : "bg-[#d9e7f5]"
-                }`}
-              />
-            );
-          })}
-        </div>
-      </div>
+    <div className="min-h-0 flex-1 overflow-hidden rounded-[24px] bg-white/95 p-4 shadow-[0_20px_40px_rgba(15,23,42,0.11)]">
+      {children}
     </div>
   );
 }
 
 function ErrorBanner({ message }: { message: string }) {
   return (
-    <div className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-700">
+    <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
       {message}
     </div>
   );
 }
 
-function RegistrationSection({
+function SectionCard({
   children,
+  icon: Icon,
   title,
 }: {
   children: ReactNode;
+  icon: (props: IconProps) => ReactNode;
   title: string;
 }) {
   return (
     <section className="rounded-xl bg-white p-4 shadow-[0_6px_16px_rgba(15,23,42,0.08)]">
-      <h3 className="mb-3 text-base font-semibold text-slate-900">{title}</h3>
+      <div className="mb-3 flex items-center gap-2">
+        <Icon className="h-4 w-4 text-[#3399e6]" />
+        <h3 className="text-base font-semibold text-slate-900">{title}</h3>
+      </div>
       <div className="space-y-3">{children}</div>
     </section>
   );
@@ -255,24 +415,9 @@ function ReadOnlyField({
   return (
     <label className="block space-y-1.5">
       <span className="text-sm font-medium text-slate-700">{label}</span>
-      <div className="flex min-h-11 items-center rounded-lg bg-[#f0f3f7] px-3 text-sm text-slate-800">
+      <div className="flex h-11 w-full items-center rounded-lg bg-[#f0f3f7] px-3 text-sm text-slate-800">
         {value}
       </div>
-    </label>
-  );
-}
-
-function StyledField({
-  children,
-  label,
-}: {
-  children: ReactNode;
-  label: string;
-}) {
-  return (
-    <label className="block space-y-1.5">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
-      {children}
     </label>
   );
 }
@@ -287,9 +432,9 @@ function PreferenceCheckbox({
   text: string;
 }) {
   return (
-    <label className="flex items-start gap-2 rounded-xl border border-[#d8e4f1] bg-[#f8fbff] px-3 py-2.5 text-left">
+    <label className="flex w-full items-start gap-2 rounded-xl border border-[#d8e4f1] bg-[#f8fbff] px-3 py-2.5 text-left">
       <input
-        className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-[#3399e6]"
+        className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 accent-[#3399e6]"
         defaultChecked={defaultChecked}
         name={name}
         type="checkbox"
@@ -299,111 +444,97 @@ function PreferenceCheckbox({
   );
 }
 
-function ServicesFootnote() {
-  return (
-    <div className="pb-1 text-center">
-      <p className="text-[11px] text-slate-500">
-        By continuing, you agree to the Transplant Wizard intake process.
-      </p>
-      <p className="mt-2 text-[11px] text-emerald-600">
-        Your onboarding information is handled in a HIPAA-compliant workflow.
-      </p>
-    </div>
-  );
-}
-
-function PanelIntro({
-  subtitle,
-  title,
+function WelcomeStep({
+  context,
+  errorMessage,
 }: {
-  subtitle: string;
-  title: string;
+  context: PatientOnboardingContext;
+  errorMessage: string | null;
 }) {
   return (
-    <div className="mb-4">
-      <h2 className="text-2xl font-semibold text-slate-900">{title}</h2>
-      <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{subtitle}</p>
-    </div>
-  );
-}
+    <PatientGradientBackground>
+      <div className="flex min-h-0 flex-1 flex-col px-5 pb-6 pt-10">
+        <EntryHero />
+        <EntryTabs activeTab="register" />
+        <EntryCard>
+          <div className="h-full overflow-y-auto pr-1">
+            <div className="space-y-5 pb-2">
+              <div className="space-y-1 text-center">
+                <h2 className="text-2xl font-bold text-slate-900">
+                  Create Your Account
+                </h2>
+                <p className="text-sm text-slate-500">
+                  Join our HIPAA-compliant transplant platform
+                </p>
+              </div>
 
-function WelcomeStep({ context }: { context: PatientOnboardingContext }) {
-  return (
-    <EntryShell
-      eyebrow="Your journey to a new beginning"
-      footer={<ServicesFootnote />}
-      hero={
-        <p>
-          Complete the remaining registration details for case{" "}
-          <span className="font-semibold text-slate-700">
-            {context.currentCase.caseNumber}
-          </span>{" "}
-          before you review the required release forms.
-        </p>
-      }
-      title="Patient Portal"
-      body={
-        <div>
-          <EntryTabs activeTab="register" />
-          <PanelIntro
-            subtitle="Join our HIPAA-compliant transplant platform"
-            title="Create Your Account"
-          />
+              {errorMessage ? <ErrorBanner message={errorMessage} /> : null}
 
-          <form action={savePatientWelcomePreferences} className="space-y-4">
-            <RegistrationSection title="Personal Information">
-              <ReadOnlyField
-                label="First name"
-                value={context.patient.firstName}
-              />
-              <ReadOnlyField label="Last name" value={context.patient.lastName} />
-            </RegistrationSection>
+              <form action={savePatientWelcomePreferences} className="space-y-5">
+                <SectionCard icon={UserIcon} title="Personal Information">
+                  <ReadOnlyField
+                    label="First Name"
+                    value={context.patient.firstName}
+                  />
+                  <ReadOnlyField
+                    label="Last Name"
+                    value={context.patient.lastName}
+                  />
+                </SectionCard>
 
-            <RegistrationSection title="Contact Information">
-              <ReadOnlyField label="Email address" value={context.patient.email} />
-              <StyledField label="Preferred language">
-                <select
-                  className="h-11 w-full rounded-lg bg-[#f0f3f7] px-3 text-sm text-slate-800 outline-none ring-offset-2 focus:ring-2 focus:ring-[#cfe7fd]"
-                  defaultValue={context.patient.preferredLanguage}
-                  name="preferredLanguage"
-                  required
+                <SectionCard icon={MailIcon} title="Contact Information">
+                  <ReadOnlyField
+                    label="Email Address"
+                    value={context.patient.email}
+                  />
+                  <label className="block space-y-1.5">
+                    <span className="text-sm font-medium text-slate-700">
+                      Preferred Language
+                    </span>
+                    <select
+                      className="h-11 w-full rounded-lg bg-[#f0f3f7] px-3 text-sm text-slate-800 outline-none ring-offset-2 focus:ring-2 focus:ring-[#cfe7fd]"
+                      defaultValue={context.patient.preferredLanguage}
+                      name="preferredLanguage"
+                      required
+                    >
+                      <option value="en">English</option>
+                      <option value="es">Spanish</option>
+                    </select>
+                  </label>
+                </SectionCard>
+
+                <SectionCard icon={BellIcon} title="Communication Preferences">
+                  <PreferenceCheckbox
+                    defaultChecked={context.currentCase.smsConsent}
+                    name="smsConsent"
+                    text="I agree to receive text reminders about my transplant intake steps."
+                  />
+                  <PreferenceCheckbox
+                    defaultChecked={context.currentCase.emailConsent}
+                    name="emailConsent"
+                    text="I agree to receive email updates about my transplant intake steps."
+                  />
+                </SectionCard>
+
+                <button
+                  className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#3399e6] text-sm font-semibold text-white shadow-[0_10px_24px_rgba(51,153,230,0.35)]"
+                  type="submit"
                 >
-                  <option value="en">English</option>
-                  <option value="es">Spanish</option>
-                </select>
-              </StyledField>
-            </RegistrationSection>
-
-            <RegistrationSection title="Communication Preferences">
-              <PreferenceCheckbox
-                defaultChecked={context.currentCase.smsConsent}
-                name="smsConsent"
-                text="I agree to receive text reminders about my transplant intake steps."
-              />
-              <PreferenceCheckbox
-                defaultChecked={context.currentCase.emailConsent}
-                name="emailConsent"
-                text="I agree to receive email updates about my transplant intake steps."
-              />
-            </RegistrationSection>
-
-            <button
-              className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#3399e6] to-[#1f83d2] text-sm font-semibold text-white shadow-[0_8px_18px_rgba(51,153,230,0.32)]"
-              type="submit"
-            >
-              Continue to ROI Form 1
-            </button>
-          </form>
-        </div>
-      }
-    />
+                  Continue
+                </button>
+              </form>
+            </div>
+          </div>
+        </EntryCard>
+      </div>
+    </PatientGradientBackground>
   );
 }
 
 function ConsentSectionBlock({ section }: { section: ConsentSection }) {
   return (
     <section>
-      <h4 className="mb-1 text-xs font-bold text-[#3380cc]">{section.heading}</h4>
+      <h5 className="mb-1 text-xs font-bold text-[#3380cc]">{section.heading}</h5>
 
       {section.paragraphs?.map((paragraph) => (
         <p key={paragraph} className="mb-2 text-[13px] leading-relaxed text-slate-700">
@@ -429,7 +560,7 @@ function ConsentSectionBlock({ section }: { section: ConsentSection }) {
 
       {section.checkItems?.map((item) => (
         <div key={item} className="mb-1.5 flex items-start gap-2 pl-2">
-          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+          <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
           <p className="text-[13px] leading-relaxed text-slate-700">{item}</p>
         </div>
       ))}
@@ -437,12 +568,55 @@ function ConsentSectionBlock({ section }: { section: ConsentSection }) {
   );
 }
 
-function SignatureBlock({
-  agreementText,
+function ConsentAcknowledgement({
+  ariaLabel,
   name,
+  text,
 }: {
-  agreementText: string;
+  ariaLabel: string;
   name: string;
+  text: string;
+}) {
+  return (
+    <label className="flex items-start gap-2.5">
+      <input
+        aria-label={ariaLabel}
+        className="mt-0.5 h-5 w-5 shrink-0 rounded border-slate-400 accent-[#1f6eb3]"
+        name={name}
+        required
+        type="checkbox"
+      />
+      <p className="text-xs leading-relaxed text-slate-700">{text}</p>
+    </label>
+  );
+}
+
+function ConsentDocumentScreen({
+  action,
+  agreementText,
+  acknowledgmentFields,
+  documentSubtitle,
+  documentTitleLines,
+  documentTitleRuleWidth,
+  errorMessage,
+  footerNote,
+  headerIcon: HeaderIcon,
+  navigationTitle,
+  sections,
+  submitLabel,
+}: {
+  action: (formData: FormData) => void;
+  agreementText: string;
+  acknowledgmentFields: ReactNode;
+  documentSubtitle?: string;
+  documentTitleLines: string[];
+  documentTitleRuleWidth: number;
+  errorMessage: string | null;
+  footerNote?: string;
+  headerIcon: (props: IconProps) => ReactNode;
+  navigationTitle: string;
+  sections: ConsentSection[];
+  submitLabel: string;
 }) {
   const formattedDate = new Date().toLocaleDateString("en-US", {
     day: "numeric",
@@ -451,340 +625,248 @@ function SignatureBlock({
   });
 
   return (
-    <div className="mt-4 border-t border-[#d7dde8] pt-5">
-      <h4 className="text-sm font-bold text-slate-900">PATIENT SIGNATURE</h4>
-
-      <p className="mt-3 text-xs leading-relaxed text-slate-700">{agreementText}</p>
-
-      <div className="mt-4">
-        <p className="mb-1 text-[11px] font-semibold text-slate-500">
-          Signature (simulated)
-        </p>
-        <div className="flex h-[100px] w-full items-center justify-center rounded-lg bg-[#f2f4f7] px-4">
-          <span className="text-3xl italic tracking-wide text-slate-500">
-            {name}
-          </span>
+    <main className="min-h-screen bg-[#edf1f6]">
+      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col">
+        <div className="border-b border-[#dfe6ef] bg-white px-4 py-3 text-center text-sm font-semibold text-slate-700">
+          {navigationTitle}
         </div>
-      </div>
 
-      <div className="mt-3 text-xs text-slate-600">
-        <span className="font-semibold text-slate-500">Date:</span> {formattedDate}
-      </div>
-    </div>
-  );
-}
-
-function ConsentDocumentScreen({
-  action,
-  acknowledgmentFields,
-  agreementText,
-  caseNumber,
-  documentSubtitle,
-  documentTitleLines,
-  documentTitleRuleWidth,
-  footerNote,
-  navigationTitle,
-  sections,
-  step,
-  submitLabel,
-  supportBody,
-}: {
-  action: (formData: FormData) => void;
-  acknowledgmentFields: ReactNode;
-  agreementText: string;
-  caseNumber: string;
-  documentSubtitle?: string;
-  documentTitleLines: string[];
-  documentTitleRuleWidth: number;
-  footerNote?: string;
-  navigationTitle: string;
-  sections: ConsentSection[];
-  step: PatientOnboardingStep;
-  submitLabel: string;
-  supportBody: string;
-}) {
-  return (
-    <PatientBackground>
-      <div className="border-b border-[#dfe6ef] bg-white px-4 py-3 text-center text-sm font-semibold text-slate-700">
-        {navigationTitle}
-      </div>
-
-      <div className="flex-1 overflow-y-auto pb-6 pt-4">
-        <div className="space-y-4">
-          <div className="space-y-3 text-center">
-            <div className="mx-auto">
-              <BrandMark />
-            </div>
-            <p className="text-xs font-bold tracking-[0.24em] text-[#3380cc]">
-              TRANSPLANT WIZARD
-            </p>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Case {caseNumber} · {stepLabels[step]}
-            </p>
-          </div>
-
-          <form action={action} className="space-y-4">
-            <div className="mx-4 rounded-xl bg-white p-5 shadow-[0_8px_18px_rgba(15,23,42,0.12)]">
-              <div className="mb-5 text-center">
-                {documentTitleLines.map((line) => (
-                  <p key={line} className="text-sm font-bold text-slate-900">
-                    {line}
-                  </p>
-                ))}
-                <div
-                  className="mx-auto mt-2 h-0.5 bg-[#3380cc]"
-                  style={{ maxWidth: "80%", width: `${documentTitleRuleWidth}px` }}
-                />
-                {documentSubtitle ? (
-                  <p className="mt-2 text-[10px] font-medium text-slate-500">
-                    {documentSubtitle}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="space-y-3">
-                {sections.map((section) => (
-                  <ConsentSectionBlock key={section.heading} section={section} />
-                ))}
-              </div>
-
-              <div className="mt-4 rounded-xl bg-[#f8fbff] p-4">
-                <h4 className="text-sm font-bold text-slate-900">
-                  Required acknowledgements
-                </h4>
-                <div className="mt-3">{acknowledgmentFields}</div>
-              </div>
-
-              <SignatureBlock
-                agreementText={agreementText}
-                name="Patient Signature"
-              />
-
-              {footerNote ? (
-                <p className="mt-3 text-[10px] italic text-slate-500">{footerNote}</p>
-              ) : null}
-            </div>
-
-            <div className="flex justify-center px-4">
-              <button
-                className="mx-auto flex h-12 w-full max-w-[420px] items-center justify-center rounded-xl bg-gradient-to-r from-[#3380cc] to-[#2a6ea9] text-center text-sm font-semibold text-white shadow-[0_8px_16px_rgba(51,128,204,0.35)]"
-                type="submit"
-              >
-                {submitLabel}
-              </button>
-            </div>
-
-            <div className="px-4 text-center">
-              <p className="text-[11px] leading-relaxed text-slate-500">
-                {supportBody}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="space-y-4 pb-6 pt-4">
+            <div className="space-y-3 text-center">
+              <HeaderIcon className="mx-auto h-12 w-12 text-[#3380cc]" />
+              <p className="text-xs font-bold tracking-[0.24em] text-[#3380cc]">
+                TRANSPLANT WIZARD
               </p>
             </div>
-          </form>
+
+            <form action={action} className="space-y-4">
+              <div className="mx-4 rounded-xl bg-white p-5 shadow-[0_8px_18px_rgba(15,23,42,0.12)]">
+                <div className="mb-5 text-center">
+                  {documentTitleLines.map((line) => (
+                    <p key={line} className="text-sm font-bold text-slate-900">
+                      {line}
+                    </p>
+                  ))}
+                  <div
+                    className="mx-auto mt-2 h-0.5 bg-[#3380cc]"
+                    style={{ maxWidth: "80%", width: `${documentTitleRuleWidth}px` }}
+                  />
+                  {documentSubtitle ? (
+                    <p className="mt-2 text-[10px] font-medium text-slate-500">
+                      {documentSubtitle}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-3">
+                  {sections.map((section) => (
+                    <ConsentSectionBlock key={section.heading} section={section} />
+                  ))}
+                </div>
+
+                <div className="mt-4 border-t border-[#d7dde8] pt-5">
+                  <h4 className="text-sm font-bold text-slate-900">
+                    PATIENT SIGNATURE
+                  </h4>
+
+                  <div className="mt-3 space-y-3">{acknowledgmentFields}</div>
+
+                  <p className="mt-3 text-xs leading-relaxed text-slate-700">
+                    {agreementText}
+                  </p>
+
+                  <div className="mt-4">
+                    <p className="mb-1 text-[11px] font-semibold text-slate-500">
+                      Signature (simulated)
+                    </p>
+                    <div className="flex h-[100px] w-full items-center justify-center rounded-lg bg-[#f2f4f7] text-slate-500">
+                      <Image
+                        alt="Simulated patient signature"
+                        className="h-[90px] w-auto object-contain"
+                        height={90}
+                        src={SIMULATED_SIGNATURE_DATA_URL}
+                        unoptimized
+                        width={320}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-3 text-xs text-slate-600">
+                    <span className="font-semibold text-slate-500">Date:</span>{" "}
+                    {formattedDate}
+                  </div>
+                  {footerNote ? (
+                    <p className="mt-3 text-[10px] italic text-slate-500">
+                      {footerNote}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+
+              {errorMessage ? (
+                <p className="px-4 text-xs text-red-600">{errorMessage}</p>
+              ) : null}
+
+              <div className="flex justify-center px-4">
+                <button
+                  className="mx-auto flex h-12 w-full max-w-[420px] items-center justify-center rounded-xl bg-gradient-to-r from-[#3380cc] to-[#2a6ea9] text-center text-sm font-semibold text-white shadow-[0_8px_16px_rgba(51,128,204,0.35)]"
+                  type="submit"
+                >
+                  {submitLabel}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </PatientBackground>
+    </main>
   );
 }
 
-function RoiForm1Step({ context }: { context: PatientOnboardingContext }) {
+function LinkRequiredStep({ errorMessage }: { errorMessage: string | null }) {
+  return (
+    <PatientGradientBackground>
+      <div className="flex min-h-0 flex-1 flex-col px-5 pb-6 pt-10">
+        <EntryHero />
+        <EntryTabs activeTab="login" />
+        <EntryCard>
+          <div className="h-full overflow-y-auto pr-1">
+            <div className="space-y-4">
+              {errorMessage ? <ErrorBanner message={errorMessage} /> : null}
+              <div className="rounded-xl bg-[#edf5ff] px-3 py-2 text-xs text-[#2a6ead]">
+                Continue with your secure onboarding link.
+              </div>
+
+              <div className="space-y-1">
+                <h2 className="text-2xl font-bold text-slate-900">
+                  Welcome Back
+                </h2>
+                <p className="text-sm text-slate-500">
+                  Open the secure sign-in link sent by your clinic to continue your
+                  transplant onboarding.
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-[#d8e4f1] bg-white px-4 py-4 text-sm leading-relaxed text-slate-600">
+                This MVP does not use a separate patient password. Your secure
+                magic-link signs you in directly and returns you to the patient
+                portal.
+              </div>
+            </div>
+          </div>
+        </EntryCard>
+      </div>
+    </PatientGradientBackground>
+  );
+}
+
+function RoiForm1Step({ errorMessage }: { errorMessage: string | null }) {
   return (
     <ConsentDocumentScreen
-      action={signPatientRoiForm1}
       acknowledgmentFields={
-        <div className="space-y-2">
-          <label className="flex items-start gap-2.5">
-            <input
-              aria-label="Acknowledge records release"
-              className="mt-0.5 h-5 w-5 shrink-0 rounded border-slate-400 accent-[#3380cc]"
-              name="acknowledgeRecordsRelease"
-              required
-              type="checkbox"
-            />
-            <span className="text-xs leading-relaxed text-slate-700">
-              I understand this release allows the transplant team to request
-              records needed for my evaluation.
-            </span>
-          </label>
-          <label className="flex items-start gap-2.5">
-            <input
-              aria-label="Acknowledge communication rights"
-              className="mt-0.5 h-5 w-5 shrink-0 rounded border-slate-400 accent-[#3380cc]"
-              name="acknowledgeCommunicationRights"
-              required
-              type="checkbox"
-            />
-            <span className="text-xs leading-relaxed text-slate-700">
-              I understand this authorization supports communication between the
-              care teams involved in my referral.
-            </span>
-          </label>
-        </div>
+        <>
+          <ConsentAcknowledgement
+            ariaLabel="Acknowledge records release"
+            name="acknowledgeRecordsRelease"
+            text="I understand this release allows the transplant team to request records needed for my evaluation."
+          />
+          <ConsentAcknowledgement
+            ariaLabel="Acknowledge communication rights"
+            name="acknowledgeCommunicationRights"
+            text="I understand this authorization supports communication between the care teams involved in my referral."
+          />
+        </>
       }
-      agreementText="I understand this release allows the transplant team to request records needed for my evaluation and supports communication between the care teams involved in my referral."
-      caseNumber={context.currentCase.caseNumber}
-      documentTitleLines={["AUTHORIZATION FOR RELEASE", "OF TRANSPLANT INTAKE RECORDS"]}
-      documentTitleRuleWidth={260}
-      navigationTitle="ROI Form 1"
-      sections={roiForm1Sections}
-      step="roi-form-1"
-      submitLabel="Sign and Continue"
-      supportBody="This first release confirms that the transplant program may collect and review the records needed to continue your intake."
-      footerNote="A second release form is required before your referral can move into the next intake stage."
+      action={signPatientRoiForm1}
+      agreementText="I have read, understand, and agree to the terms of this Consent for Transplant Wizard Services."
+      documentTitleLines={["CONSENT FOR TRANSPLANT WIZARD SERVICES"]}
+      documentTitleRuleWidth={200}
+      errorMessage={errorMessage}
+      headerIcon={CrossIcon}
+      navigationTitle="Services Consent"
+      sections={SERVICES_CONSENT_SECTIONS}
+      submitLabel="I Agree & Continue"
     />
   );
 }
 
-function RoiForm2Step({ context }: { context: PatientOnboardingContext }) {
+function RoiForm2Step({ errorMessage }: { errorMessage: string | null }) {
   return (
     <ConsentDocumentScreen
-      action={signPatientRoiForm2}
       acknowledgmentFields={
-        <div className="space-y-2">
-          <label className="flex items-start gap-2.5">
-            <input
-              aria-label="Acknowledge HIPAA authorization"
-              className="mt-0.5 h-5 w-5 shrink-0 rounded border-slate-400 accent-[#3380cc]"
-              name="acknowledgeHipaaAuthorization"
-              required
-              type="checkbox"
-            />
-            <span className="text-xs leading-relaxed text-slate-700">
-              I authorize the transplant program to use and disclose the protected
-              health information needed for my intake.
-            </span>
-          </label>
-          <label className="flex items-start gap-2.5">
-            <input
-              aria-label="Acknowledge sensitive information"
-              className="mt-0.5 h-5 w-5 shrink-0 rounded border-slate-400 accent-[#3380cc]"
-              name="acknowledgeSensitiveInformation"
-              required
-              type="checkbox"
-            />
-            <span className="text-xs leading-relaxed text-slate-700">
-              I understand this authorization may include sensitive information
-              needed for the transplant center to continue my evaluation.
-            </span>
-          </label>
-        </div>
+        <>
+          <ConsentAcknowledgement
+            ariaLabel="Acknowledge HIPAA authorization"
+            name="acknowledgeHipaaAuthorization"
+            text="I authorize the transplant program to use and disclose the protected health information needed for my intake."
+          />
+          <ConsentAcknowledgement
+            ariaLabel="Acknowledge sensitive information"
+            name="acknowledgeSensitiveInformation"
+            text="I understand this authorization may include sensitive information needed for the transplant center to continue my evaluation."
+          />
+        </>
       }
-      agreementText="By signing below, I certify that I have read and understand this Authorization for Release of Protected Health Information and I voluntarily consent to the disclosure of my health information as described above."
-      caseNumber={context.currentCase.caseNumber}
+      action={signPatientRoiForm2}
+      agreementText="I authorize the release of my protected health information as described above and understand my rights regarding this authorization."
       documentSubtitle="HIPAA COMPLIANT • 45 CFR § 164.508"
       documentTitleLines={[
         "AUTHORIZATION FOR RELEASE",
         "OF PROTECTED HEALTH INFORMATION",
       ]}
       documentTitleRuleWidth={280}
-      footerNote="Submitting this form completes the explicit onboarding checkpoint and advances your case to initial TODOs."
-      navigationTitle="ROI Form 2"
-      sections={roiForm2Sections}
-      step="roi-form-2"
-      submitLabel="Sign and Finish"
-      supportBody="This is the final required onboarding form. Once it is signed, your referral moves into the next transplant intake stage."
+      errorMessage={errorMessage}
+      footerNote="This form complies with HIPAA regulations (45 CFR Parts 160 and 164) and applicable state privacy laws."
+      headerIcon={FileTextIcon}
+      navigationTitle="Medical Records Authorization"
+      sections={MEDICAL_CONSENT_SECTIONS}
+      submitLabel="I Authorize & Continue"
     />
   );
 }
 
 function CompleteStep({ context }: { context: PatientOnboardingContext }) {
   return (
-    <EntryShell
-      eyebrow="Your journey to a new beginning"
-      hero={
-        <p>
-          Your release forms are complete and your transplant intake onboarding has
-          been received successfully.
-        </p>
-      }
-      title="Patient Portal"
-      body={
-        <div>
-          <PanelIntro
-            subtitle={`Case ${context.currentCase.caseNumber} is ready for the next intake stage`}
-            title={`You're all set, ${context.patient.firstName}`}
-          />
+    <PatientGradientBackground>
+      <div className="flex min-h-0 flex-1 flex-col px-5 pb-6 pt-10">
+        <EntryHero />
+        <EntryCard>
+          <div className="h-full overflow-y-auto pr-1">
+            <div className="space-y-4 pb-2">
+              <section className="rounded-2xl bg-gradient-to-r from-[#3380cc] to-[#2a6ea9] p-4 shadow-[0_12px_24px_rgba(42,110,169,0.35)]">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
+                  Welcome Back
+                </p>
+                <h2 className="mt-1 text-2xl font-bold text-white">
+                  {context.patient.firstName}
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-blue-100">
+                  Your onboarding forms are complete. The transplant team will
+                  contact you about the next steps in your intake process.
+                </p>
+              </section>
 
-          <section className="rounded-2xl bg-gradient-to-r from-[#3380cc] to-[#2a6ea9] p-4 shadow-[0_12px_24px_rgba(42,110,169,0.35)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
-              Onboarding complete
-            </p>
-            <h2 className="mt-1 text-2xl font-bold text-white">
-              Release forms completed
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-blue-100">
-              Thank you. The transplant team will contact you about next steps in
-              your intake process.
-            </p>
-          </section>
-
-          <section className="mt-4 rounded-xl bg-white p-4 shadow-[0_6px_16px_rgba(15,23,42,0.08)]">
-            <h3 className="text-base font-semibold text-slate-900">
-              What to expect next
-            </h3>
-            <div className="mt-3 space-y-2">
-              <div className="rounded-xl bg-[#f4f8fd] px-4 py-3">
-                <p className="text-sm font-medium text-slate-900">
-                  Your referral has moved into the next intake stage.
+              <section className="rounded-2xl bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.07)]">
+                <div className="mb-2 flex items-center gap-2">
+                  <FileTextIcon className="h-4 w-4 text-[#3399e6]" />
+                  <h3 className="text-base font-semibold text-slate-900">
+                    Onboarding Complete
+                  </h3>
+                </div>
+                <p className="text-sm leading-relaxed text-slate-600">
+                  Your authorization forms have been received and your referral is
+                  ready for the next intake stage.
                 </p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                  This milestone intentionally stops here. No dashboard or TODO list
-                  is shown until later steps are implemented.
-                </p>
-              </div>
-              <div className="rounded-xl bg-[#f4f8fd] px-4 py-3">
-                <p className="text-sm font-medium text-slate-900">
-                  Keep an eye on your messages and phone.
-                </p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                  The transplant team may contact you to confirm next intake actions.
-                </p>
-              </div>
+                <div className="mt-3 rounded-xl bg-[#edf5ff] px-3 py-3 text-xs leading-relaxed text-[#2a6ead]">
+                  Case {context.currentCase.caseNumber} has advanced successfully.
+                </div>
+              </section>
             </div>
-          </section>
-        </div>
-      }
-    />
-  );
-}
-
-function LinkRequiredStep({ errorMessage }: { errorMessage: string | null }) {
-  return (
-    <EntryShell
-      eyebrow="Your journey to a new beginning"
-      hero={
-        <p>
-          Open the secure onboarding link shared by your clinic or transplant team to
-          enter the patient portal.
-        </p>
-      }
-      title="Patient Portal"
-      body={
-        <div>
-          <EntryTabs activeTab="login" />
-          {errorMessage ? <ErrorBanner message={errorMessage} /> : null}
-          <PanelIntro
-            subtitle="Continue with your secure onboarding link"
-            title="Welcome Back"
-          />
-
-          <RegistrationSection title="Secure portal access">
-            <p className="text-sm leading-relaxed text-slate-600">
-              Your onboarding link will sign you in automatically and return you to
-              the patient portal without a separate registration flow.
-            </p>
-            <div className="space-y-2 rounded-xl bg-[#f4f8fd] px-4 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#3380cc]">
-                Before you begin
-              </p>
-              <p className="text-sm leading-relaxed text-slate-600">
-                Have your phone available in case the transplant team needs to follow
-                up after you complete the release forms.
-              </p>
-            </div>
-          </RegistrationSection>
-        </div>
-      }
-    />
+          </div>
+        </EntryCard>
+      </div>
+    </PatientGradientBackground>
   );
 }
 
@@ -802,15 +884,15 @@ export function PatientOnboardingView({
   }
 
   if (step === "welcome") {
-    return <WelcomeStep context={context} />;
+    return <WelcomeStep context={context} errorMessage={errorMessage} />;
   }
 
   if (step === "roi-form-1") {
-    return <RoiForm1Step context={context} />;
+    return <RoiForm1Step errorMessage={errorMessage} />;
   }
 
   if (step === "roi-form-2") {
-    return <RoiForm2Step context={context} />;
+    return <RoiForm2Step errorMessage={errorMessage} />;
   }
 
   return <CompleteStep context={context} />;

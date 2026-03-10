@@ -103,17 +103,17 @@ async function buildPatientRedirectTo() {
   const origin = requestHeaders.get("origin");
 
   if (origin) {
-    return `${origin}/patient`;
+    return `${origin}/patient/auth/callback`;
   }
 
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
 
   if (!host) {
-    return "http://localhost:3000/patient";
+    return "http://localhost:3000/patient/auth/callback";
   }
 
-  return `${protocol}://${host}/patient`;
+  return `${protocol}://${host}/patient/auth/callback`;
 }
 
 async function ensurePatientAuthUser(

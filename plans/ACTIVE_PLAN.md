@@ -208,19 +208,35 @@ Prove the first real multi-portal handoff with real auth, real persistence, audi
   - Live clinic email/password login verification with the seeded clinic user
   - Live referral submission verification through the clinic flow, including patient creation, case creation, audit events, and manual onboarding-link display
   - Step-5 fix: moved the initial referral action state out of the `use server` module so form posts execute successfully
+  - Patient magic-link callback handling that establishes a session and redirects to `/patient`
+  - Live patient onboarding verification through `Welcome & Preferences`, `ROI Form 1`, `ROI Form 2`, and `Onboarding Complete`
+  - Distinct ROI completion checkpoint verification:
+    - `roi_form_2_signed_at` written
+    - `roi_completed_at` written
+    - `roi-form-2-signed` audit event written
+    - `stage-transitioned` audit event written
+    - case advanced from `patient-onboarding` to `initial-todos`
+    - `stage_entered_at` updated
 
 ### Validation
 - Automated workflow coverage for `new-referral` to `patient-onboarding` to `initial-todos`
 - RLS verification for clinic, patient, and Front Desk access
 - One end-to-end smoke path covering referral submission, onboarding, ROI completion, clinic list update, and Front Desk queue visibility
 - Build and typecheck
+- Live verification completed through step 6:
+  - clinic login
+  - referral submission
+  - patient magic-link generation
+  - patient onboarding progression
+  - explicit ROI completion checkpoint
+  - `initial-todos` transition
 
 ### Risks
 - Bootstrap creep
 - Auth creep
 - Workflow creep
 - Schema creep
-- Step 6 onward remains unverified and unimplemented
+- Steps 7 through 9 remain unverified and unimplemented
 
 ### Explicit Defer List
 - Real email invite sending
@@ -260,7 +276,7 @@ Prove the first real multi-portal handoff with real auth, real persistence, audi
 3. [x] Add the minimum schema and RLS
 4. [x] Seed one clinic user and one Front Desk user in a configured Supabase project, using the committed organization seed data and `npm run seed:staff`
 5. [x] Implement clinic referral creation and the manual onboarding-link success state
-6. [ ] Implement patient onboarding screens and the ROI completion checkpoint
+6. [x] Implement patient onboarding screens and the ROI completion checkpoint
 7. [ ] Implement the clinic read-only referrals list
 8. [ ] Implement the Front Desk read-only intake queue
 9. [ ] Add workflow, RLS, and smoke coverage

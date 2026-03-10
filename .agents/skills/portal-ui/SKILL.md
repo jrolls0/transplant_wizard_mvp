@@ -172,6 +172,33 @@ function DecisionModal({ decisionType, outcomes, onSubmit }: DecisionModalProps)
 }
 ```
 
+## Browser-based visual verification
+
+When working on patient or center UI and Playwright MCP is available:
+
+1. Before editing, inspect:
+   - current rebuilt app
+   - the relevant running prototype reference
+2. Compare:
+   - layout hierarchy
+   - spacing
+   - typography feel
+   - card treatment
+   - button styling
+   - visual density
+   - form/consent presentation
+3. After editing, use Playwright again to verify the result and capture screenshots for review.
+
+Reference prototype URLs for this workspace:
+- Patient prototype: http://127.0.0.1:3001/mobile
+- Center prototype: http://localhost:3000/dashboard/
+
+Do not use Playwright for backend-only tasks or schema-only batches.
+Use it when:
+- replicating an existing prototype
+- doing UI fidelity passes
+- reviewing visual regressions before approval
+
 ## Working Rules
 - Match the portal’s approved visual direction before inventing new styling
 - Use realistic healthcare/workflow content instead of generic placeholders

@@ -27,3 +27,6 @@
 - Update `docs/WORKING_MEMORY.md`
 - Update `docs/LEARNINGS.md` if a durable pattern or gotcha emerged
 - Run validation commands from `plans/ACTIVE_PLAN.md`
+
+
+NOTE: For UI work, if Playwright MCP is available, inspect the running app and the relevant prototype reference before and after changes.

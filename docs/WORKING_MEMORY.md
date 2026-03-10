@@ -1,13 +1,13 @@
 # Working Memory
 
-Last updated: 03/09/2026
+Last updated: 03/10/2026
 
 ## Current Milestone
 Milestone 2: Cross-Portal Intake Slice
 
 ## Status
 - Completed: Workspace hardening and Codex workspace setup
-- In progress: Milestone 2 step 5 is implemented and live-verified; step 6 has not started
+- In progress: Milestone 2 step 6 is implemented and live-verified; steps 7 and 8 have not started
 - Blocked: None
 
 ## Completed
@@ -34,6 +34,15 @@ Milestone 2: Cross-Portal Intake Slice
   - Referral submission creates the patient row, case row, and required audit events
   - The patient magic-link URL is generated and displayed on the referral success state
 - Step-5 fix applied: the initial referral action state now lives outside the `use server` module so the clinic form can post successfully
+- Patient auth callback handling added so the magic-link establishes a session and redirects into `/patient`
+- Patient onboarding screens added for `Welcome & Preferences`, `ROI Form 1`, `ROI Form 2`, and `Onboarding Complete`
+- Distinct ROI completion checkpoint path added for `ROI Form 2`
+- Step 6 was verified live:
+  - The patient magic-link establishes a patient session and reaches `/patient`
+  - `Welcome & Preferences` writes patient language plus case SMS/email consent
+  - `ROI Form 1` writes `roi_form_1_signed_at` and the `roi-form-1-signed` audit event
+  - `ROI Form 2` writes `roi_form_2_signed_at`, sets `roi_completed_at`, writes the ROI and stage-transition audit events, and moves the case to `initial-todos`
+  - `/patient` shows the `Onboarding Complete` state after the checkpoint
 
 ## Locked Scope
 - Clinic referral submission surface
@@ -92,8 +101,8 @@ Milestone 2: Cross-Portal Intake Slice
 - Milestone 2 keeps denormalized case fields intentionally
 - Invite delivery is manual and temporary in this milestone
 - Scope must stop at `initial-todos`
-- Patient onboarding, clinic referrals list, and Front Desk queue are still unimplemented
+- Clinic referrals list and Front Desk queue are still unimplemented
 - No automated workflow or RLS verification exists yet for the full Milestone 2 slice
 
 ## Next Step
-Review and approve step 5. Do not begin step 6 until this review is complete.
+Review and approve step 6. Do not begin step 7 until this review is complete.

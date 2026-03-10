@@ -1,7 +1,9 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
+import type { ClinicReferralListItem } from "@/lib/clinic/referrals";
 import { normalizePortalType } from "@/lib/auth/portal";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { hasSupabaseServiceRoleEnv } from "@/lib/supabase/env";
@@ -29,6 +31,7 @@ export type ClinicReferralActionState = {
   message: string | null;
   onboardingLink: string | null;
   patientName: string | null;
+  referralListItem: ClinicReferralListItem | null;
   status: "idle" | "error" | "success";
 };
 
@@ -218,6 +221,7 @@ export async function submitClinicReferral(
       message: "Fix the required referral fields and submit again.",
       onboardingLink: null,
       patientName: null,
+      referralListItem: null,
       status: "error",
     };
   }
@@ -235,6 +239,7 @@ export async function submitClinicReferral(
       message: "You must sign in with a clinic account before submitting a referral.",
       onboardingLink: null,
       patientName: null,
+      referralListItem: null,
       status: "error",
     };
   }
@@ -250,6 +255,7 @@ export async function submitClinicReferral(
       message: "The active session is not authorized for the clinic portal.",
       onboardingLink: null,
       patientName: null,
+      referralListItem: null,
       status: "error",
     };
   }
@@ -267,6 +273,7 @@ export async function submitClinicReferral(
       message: "The clinic profile for the active user is missing.",
       onboardingLink: null,
       patientName: null,
+      referralListItem: null,
       status: "error",
     };
   }
@@ -281,6 +288,7 @@ export async function submitClinicReferral(
       message: "Only clinic DUSW or clinic nephrologist users can submit referrals.",
       onboardingLink: null,
       patientName: null,
+      referralListItem: null,
       status: "error",
     };
   }
@@ -293,6 +301,7 @@ export async function submitClinicReferral(
         "Referral submission requires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
       onboardingLink: null,
       patientName: null,
+      referralListItem: null,
       status: "error",
     };
   }
@@ -344,7 +353,7 @@ export async function submitClinicReferral(
         stage: "patient-onboarding",
         submitted_by_role: profile.role,
       })
-      .select("id")
+      .select("id, created_at, stage, stage_entered_at")
       .single();
 
     if (caseError || !createdCase) {
@@ -385,12 +394,21 @@ export async function submitClinicReferral(
       throw auditError;
     }
 
+    revalidatePath("/clinic");
+
     return {
       caseNumber,
       errors: {},
       message: "Referral submitted. Copy the onboarding link and deliver it manually.",
       onboardingLink: patientAuth.actionLink,
       patientName: `${patient.first_name} ${patient.last_name}`,
+      referralListItem: {
+        caseNumber,
+        createdAt: createdCase.created_at,
+        patientName: `${patient.first_name} ${patient.last_name}`,
+        stage: createdCase.stage,
+        stageEnteredAt: createdCase.stage_entered_at,
+      },
       status: "success",
     };
   } catch (error) {
@@ -403,6 +421,7 @@ export async function submitClinicReferral(
           : "The referral could not be created.",
       onboardingLink: null,
       patientName: null,
+      referralListItem: null,
       status: "error",
     };
   }

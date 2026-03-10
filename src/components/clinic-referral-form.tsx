@@ -6,6 +6,10 @@ import {
   submitClinicReferral,
   type ClinicReferralActionState,
 } from "@/app/clinic/actions";
+import {
+  getClinicStageMeta,
+  type ClinicReferralListItem,
+} from "@/lib/clinic/referrals";
 
 const initialClinicReferralActionState: ClinicReferralActionState = {
   caseNumber: null,
@@ -13,6 +17,7 @@ const initialClinicReferralActionState: ClinicReferralActionState = {
   message: null,
   onboardingLink: null,
   patientName: null,
+  referralListItem: null,
   status: "idle",
 };
 
@@ -79,12 +84,146 @@ async function copyToClipboard(text: string) {
   return true;
 }
 
-export function ClinicReferralForm() {
+function formatListDate(dateValue: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(dateValue));
+}
+
+function ClinicStatusBadge({ stage }: { stage: ClinicReferralListItem["stage"] }) {
+  const stageMeta = getClinicStageMeta(stage);
+
+  return (
+    <div
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${stageMeta.accentClass}`}
+    >
+      {stageMeta.label}
+    </div>
+  );
+}
+
+function ClinicReferralRow({ referral }: { referral: ClinicReferralListItem }) {
+  const stageMeta = getClinicStageMeta(referral.stage);
+
+  return (
+    <div className="grid gap-4 border-t border-[var(--border)] px-6 py-5 md:grid-cols-[minmax(0,1.25fr)_minmax(0,0.9fr)_minmax(0,0.9fr)] md:items-center">
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-[var(--foreground)]">
+          {referral.patientName}
+        </p>
+        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[var(--muted)]">
+          {referral.caseNumber}
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <ClinicStatusBadge stage={referral.stage} />
+        <p className="text-sm text-[var(--muted)]">{stageMeta.helperText}</p>
+      </div>
+
+      <div className="space-y-1 text-sm text-[var(--muted)]">
+        <p className="font-medium text-[var(--foreground)]">
+          Updated {formatListDate(referral.stageEnteredAt)}
+        </p>
+        <p>Referred {formatListDate(referral.createdAt)}</p>
+      </div>
+    </div>
+  );
+}
+
+function ClinicReferralsList({
+  referrals,
+}: {
+  referrals: ClinicReferralListItem[];
+}) {
+  if (!referrals.length) {
+    return (
+      <section className="rounded-[28px] border border-[var(--border)] bg-white/90 p-8 shadow-[0_20px_60px_rgba(16,36,63,0.08)]">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight text-[var(--foreground)]">
+              Referral status
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+              Read-only milestone list for referrals created by your clinic
+              organization.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-[24px] border border-dashed border-[var(--border)] bg-[#f8fbff] px-6 py-10 text-center">
+          <p className="text-base font-medium text-[var(--foreground)]">
+            No referrals yet
+          </p>
+          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+            Submit the first referral above to populate this read-only status list.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="rounded-[28px] border border-[var(--border)] bg-white/90 shadow-[0_20px_60px_rgba(16,36,63,0.08)]">
+      <div className="flex flex-wrap items-end justify-between gap-4 px-8 pb-6 pt-8">
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight text-[var(--foreground)]">
+            Referral status
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+            Read-only milestone list for referrals created by your clinic
+            organization.
+          </p>
+        </div>
+        <p className="text-sm text-[var(--muted)]">
+          Showing {referrals.length} referral{referrals.length === 1 ? "" : "s"}
+        </p>
+      </div>
+
+      <div className="hidden border-y border-[var(--border)] bg-[#f8fbff] px-6 py-3 md:grid md:grid-cols-[minmax(0,1.25fr)_minmax(0,0.9fr)_minmax(0,0.9fr)] md:gap-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
+          Patient / Case
+        </p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
+          Current stage
+        </p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
+          Dates
+        </p>
+      </div>
+
+      <div>
+        {referrals.map((referral, index) => (
+          <div key={referral.caseNumber} className={index === 0 ? "border-t border-[var(--border)] md:border-t-0" : ""}>
+            <ClinicReferralRow referral={referral} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export function ClinicReferralForm({
+  initialReferrals,
+}: {
+  initialReferrals: ClinicReferralListItem[];
+}) {
+  const [copyMessage, setCopyMessage] = useState<string | null>(null);
   const [state, formAction, isPending] = useActionState(
     submitClinicReferral,
     initialClinicReferralActionState,
   );
-  const [copyMessage, setCopyMessage] = useState<string | null>(null);
+  const referrals =
+    state.referralListItem
+      ? [
+          state.referralListItem,
+          ...initialReferrals.filter(
+            (referral) =>
+              referral.caseNumber !== state.referralListItem?.caseNumber,
+          ),
+        ]
+      : initialReferrals;
 
   async function handleCopy(link: string) {
     try {
@@ -102,8 +241,8 @@ export function ClinicReferralForm() {
           Submit new transplant referral
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-          This step is limited to the required referral data and the manual onboarding
-          link handoff. No clinic dashboard or patient list is included yet.
+          This step is limited to the required referral data, the manual onboarding
+          link handoff, and the read-only Milestone 2 referral status list.
         </p>
 
         <form action={formAction} className="mt-6 space-y-6">
@@ -186,7 +325,8 @@ export function ClinicReferralForm() {
             <span className="font-semibold text-[var(--foreground)]">
               {state.caseNumber}
             </span>
-            . Deliver the onboarding link manually for this milestone.
+            . Deliver the onboarding link manually for this milestone. The new case
+            also appears in the referral status list below.
           </p>
 
           <div className="mt-6 space-y-3">
@@ -213,6 +353,8 @@ export function ClinicReferralForm() {
           </div>
         </section>
       ) : null}
+
+      <ClinicReferralsList referrals={referrals} />
     </div>
   );
 }

@@ -217,6 +217,19 @@ Prove the first real multi-portal handoff with real auth, real persistence, audi
     - `stage-transitioned` audit event written
     - case advanced from `patient-onboarding` to `initial-todos`
     - `stage_entered_at` updated
+  - Clinic read-only referrals/status list on `/clinic`, scoped to the authenticated clinic organization through the existing RLS path
+  - Live step-7 verification of the clinic list:
+    - authenticated clinic user sees the referrals/status list on `/clinic`
+    - the list shows case number, patient name, current stage, last-updated time, and referral-created time
+    - the list renders both `patient-onboarding` and `initial-todos` from live case data
+    - a newly submitted referral appears immediately in the list with `patient-onboarding`
+  - Front Desk login flow on `/center` for the seeded Front Desk user
+  - Front Desk read-only intake queue on `/center`, using the existing RLS path that limits visible cases to `initial-todos`
+  - Live step-8 verification of the center queue:
+    - Front Desk login works with the seeded user
+    - the queue shows case number, patient name, clinic name, current stage, and ROI completed timestamp
+    - the visible queue count matches the live `initial-todos` case count
+    - known live `patient-onboarding` cases do not appear in the queue
 
 ### Validation
 - Automated workflow coverage for `new-referral` to `patient-onboarding` to `initial-todos`
@@ -224,19 +237,24 @@ Prove the first real multi-portal handoff with real auth, real persistence, audi
 - One end-to-end smoke path covering referral submission, onboarding, ROI completion, clinic list update, and Front Desk queue visibility
 - Build and typecheck
 - Live verification completed through step 6:
+- Live verification completed through step 7:
+- Live verification completed through step 8:
   - clinic login
   - referral submission
   - patient magic-link generation
   - patient onboarding progression
   - explicit ROI completion checkpoint
   - `initial-todos` transition
+  - clinic referrals/status list rendering real case stages for the clinic org
+  - Front Desk login and read-only intake queue
+  - browser-visible RLS boundary check for `initial-todos` vs `patient-onboarding`
 
 ### Risks
 - Bootstrap creep
 - Auth creep
 - Workflow creep
 - Schema creep
-- Steps 7 through 9 remain unverified and unimplemented
+- Step 9 remains unverified and unimplemented
 
 ### Explicit Defer List
 - Real email invite sending

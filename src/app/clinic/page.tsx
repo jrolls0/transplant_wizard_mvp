@@ -2,6 +2,8 @@ import { PortalFrame } from "@/components/portal-frame";
 import { ClinicReferralForm } from "@/components/clinic-referral-form";
 import { signInStaff, signOut } from "@/app/actions/auth";
 import { getPortalSessionSummary } from "@/lib/auth/session";
+import type { ClinicReferralListItem } from "@/lib/clinic/referrals";
+import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -23,10 +25,52 @@ function getLoginErrorMessage(error?: string) {
   return null;
 }
 
+async function getClinicReferrals(): Promise<ClinicReferralListItem[]> {
+  const supabase = await createServerSupabaseClient();
+  const { data: cases, error: casesError } = await supabase
+    .from("cases")
+    .select("case_number, created_at, patient_id, stage, stage_entered_at")
+    .order("created_at", { ascending: false });
+
+  if (casesError || !cases?.length) {
+    return [];
+  }
+
+  const patientIds = Array.from(new Set(cases.map((clinicCase) => clinicCase.patient_id)));
+
+  const { data: patients, error: patientsError } = await supabase
+    .from("patients")
+    .select("id, first_name, last_name")
+    .in("id", patientIds);
+
+  if (patientsError || !patients) {
+    return [];
+  }
+
+  const patientNameById = new Map(
+    patients.map((patient) => [
+      patient.id,
+      `${patient.first_name} ${patient.last_name}`.trim(),
+    ]),
+  );
+
+  return cases
+    .map((clinicCase) => ({
+      caseNumber: clinicCase.case_number,
+      createdAt: clinicCase.created_at,
+      patientName: patientNameById.get(clinicCase.patient_id) ?? "Unknown patient",
+      stage: clinicCase.stage,
+      stageEnteredAt: clinicCase.stage_entered_at,
+    }))
+    .filter((clinicCase) => Boolean(clinicCase.patientName));
+}
+
 export default async function ClinicPage({ searchParams }: ClinicPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const session = await getPortalSessionSummary("clinic");
   const loginError = getLoginErrorMessage(resolvedSearchParams?.error);
+  const clinicReferrals =
+    session.hasSession && session.portalMatches ? await getClinicReferrals() : [];
 
   if (!session.isConfigured) {
     return (
@@ -109,12 +153,12 @@ export default async function ClinicPage({ searchParams }: ClinicPageProps) {
   }
 
   return (
-    <PortalFrame
-      description="This step implements clinic authentication, referral creation, and the manual onboarding-link success state only."
-      portal="clinic"
-      status={`Signed in as ${session.email ?? "clinic user"}`}
-      title="Clinic referral intake"
-    >
+      <PortalFrame
+        description="Clinic users can submit referrals and review the current Milestone 2 status for referrals created by their organization."
+        portal="clinic"
+        status={`Signed in as ${session.email ?? "clinic user"}`}
+        title="Clinic referral intake"
+      >
       <section className="mb-6 rounded-[28px] border border-[var(--border)] bg-white/90 p-8 shadow-[0_20px_60px_rgba(16,36,63,0.08)]">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -122,8 +166,8 @@ export default async function ClinicPage({ searchParams }: ClinicPageProps) {
               Active clinic session
             </h2>
             <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-              Referral submission is available. The clinic referrals list remains
-              deferred to step 7.
+              Referral submission and the read-only referral status list are
+              available for this clinic organization.
             </p>
           </div>
 
@@ -139,7 +183,7 @@ export default async function ClinicPage({ searchParams }: ClinicPageProps) {
         </div>
       </section>
 
-      <ClinicReferralForm />
+      <ClinicReferralForm initialReferrals={clinicReferrals} />
     </PortalFrame>
   );
 }

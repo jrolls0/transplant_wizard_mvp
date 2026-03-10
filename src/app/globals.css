@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --accent: #2f6ea8;
+  --accent-soft: rgba(47, 110, 168, 0.16);
+  --accent-strong: #255985;
+  --border: rgba(16, 36, 63, 0.12);
+  --danger: #8a2133;
+  --foreground: #10243f;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: #f4f7fb;
+  color: #10243f;
+  --muted: #45617f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(52, 152, 219, 0.12), transparent 32%),
+    linear-gradient(180deg, #f8fbff 0%, #eef3f8 100%);
+}
+
+a {
+  color: inherit;
+}
+
+.portal-shell {
+  min-height: 100vh;
+  padding: 48px 20px;
+}
+
+.portal-card {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px;
+  border: 1px solid rgba(16, 36, 63, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 20px 60px rgba(16, 36, 63, 0.08);
+}
+
+.portal-kicker {
+  margin: 0 0 12px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2f6ea8;
+}
+
+.portal-title {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.05;
+}
+
+.portal-copy {
+  margin: 16px 0 0;
+  max-width: 60ch;
+  line-height: 1.6;
+  color: #3c526e;
+}
+
+.status-list {
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.status-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #f7faff;
+}
+
+.status-label {
+  font-weight: 700;
+}
+
+.status-value {
+  word-break: break-word;
+  color: #28425f;
+}
+
+.status-note {
+  margin: 24px 0 0;
+  padding: 16px 18px;
+  border-left: 4px solid #2f6ea8;
+  border-radius: 12px;
+  background: rgba(47, 110, 168, 0.08);
+  color: #28425f;
+  line-height: 1.6;
+}

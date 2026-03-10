@@ -2,7 +2,7 @@
 
 Durable patterns, gotchas, and things that work (or don't). Keep entries short.
 
-Last updated: [DATE]
+Last updated: 03/09/2026
 
 ---
 

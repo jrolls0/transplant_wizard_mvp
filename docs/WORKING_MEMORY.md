@@ -1,92 +1,99 @@
 # Working Memory
 
-Last updated: 2026-03-09
+Last updated: 03/09/2026
 
 ## Current Milestone
-Milestone 2: First product implementation planning
+Milestone 2: Cross-Portal Intake Slice
 
 ## Status
-- **Completed**: Workspace hardening and Codex structure setup
-- **In Progress**: Defining the first real product implementation milestone
-- **Blocked**: None
+- Completed: Workspace hardening and Codex workspace setup
+- In progress: Milestone 2 step 5 is implemented and live-verified; step 6 has not started
+- Blocked: None
 
-## What Was Completed
+## Completed
 - Root `AGENTS.md` established for stable repo-wide rules
 - Repo-local skills added under `.agents/skills/`
 - Agent configs added (`planner`, `reviewer`, `database-architect`, `tester`)
-- File-backed memory structure established:
-  - `docs/WORKING_MEMORY.md`
-  - `plans/ACTIVE_PLAN.md`
-  - `docs/IMPLEMENT.md`
-  - `docs/LEARNINGS.md`
-- Subtree override files added for:
-  - `reference/`
-  - `src/`
-  - `supabase/`
+- File-backed memory established in `docs/WORKING_MEMORY.md`, `plans/ACTIVE_PLAN.md`, `docs/IMPLEMENT.md`, and `docs/LEARNINGS.md`
+- Subtree override files added for `reference/`, `src/`, and `supabase/`
 - Reference prototypes added and protected as read-only
 - Initial ADR structure established in `docs/decisions/`
+- ADR-001 recorded the current platform direction: Next.js + Supabase
+- Milestone 2 was selected and locked as the Cross-Portal Intake Slice
+- Minimal Next.js scaffold added with only `/clinic`, `/patient`, and `/center`
+- Supabase SSR auth foundation and portal-aware proxy added
+- Milestone 2 foundation migration added for minimum schema and RLS
+- Organization seed data added
+- `npm run seed:staff` bootstrap script added and executed successfully for the clinic and Front Desk users
+- Clinic login page added on `/clinic` for the clinic Supabase email/password path
+- Clinic referral form added with the 9 locked Milestone 2 required fields
+- Server-side referral action added to create the patient record, case record, case number, audit events, and patient magic link
+- Manual onboarding-link success state added to the clinic flow
+- Step 5 was verified live:
+  - Clinic email/password login works with the seeded clinic user
+  - Referral submission creates the patient row, case row, and required audit events
+  - The patient magic-link URL is generated and displayed on the referral success state
+- Step-5 fix applied: the initial referral action state now lives outside the `use server` module so the clinic form can post successfully
 
-## What Is In Progress
-- Finalizing the first concrete build milestone
-- Validating that the workspace structure supports clean long-running Codex sessions
-- Deciding the best first implementation slice for the actual product
+## Locked Scope
+- Clinic referral submission surface
+- Manual copyable real patient auth link
+- `Welcome & Preferences`
+- `ROI Form 1`
+- `ROI Form 2`
+- `Onboarding Complete`
+- Explicit `patient-onboarding` to `initial-todos` workflow transition
+- Clinic read-only referrals list
+- Front Desk read-only intake queue
 
-## Next Step
-1. Define Milestone 2 concretely in `plans/ACTIVE_PLAN.md`
-2. Choose the first real implementation slice
-3. Start planner-led implementation planning for that milestone
-4. Begin real product work with memory files and runbook in place
+## Explicit Defer List
+- Real email invite sending
+- Real SMS invite sending
+- Invite reminder logic
+- ROI reminder logic
+- Care partner prompt
+- Care partner invitation
+- Care partner auth
+- Care partner status view
+- Patient dashboard
+- Patient checklist UI
+- Patient TODO list UI
+- Inclusion/Exclusion form
+- Government ID upload
+- Insurance card upload
+- Patient messaging
+- Clinic dashboard beyond simple referrals list
+- Clinic document checklist
+- Clinic document upload
+- Clinic packet initialization UI
+- Front Desk case detail surface
+- Front Desk write actions
+- Front Desk document review
+- Front Desk screening actions
+- Financial screening
+- PTC assignment
+- SLA timers and alerts
+- Realtime subscriptions
+- End referral
+- Re-referral
+- Admin/configuration UI
 
-## Key Decisions
-| Decision | Rationale | ADR |
-|----------|-----------|-----|
-| `AGENTS.md` is for stable rules only | Prevents context rot and instruction bloat | - |
-| `docs/WORKING_MEMORY.md` stores evolving execution state | Separates current state from stable instructions | - |
-| `plans/ACTIVE_PLAN.md` is the execution source of truth | Keeps milestone scope explicit | - |
-| `docs/LEARNINGS.md` stores durable patterns and gotchas | Avoids losing useful lessons across sessions | - |
-| `reference/` is read-only | Protects prototype/reference code from accidental edits | - |
-| Next.js + Supabase is the current platform direction | Strong fit for MVP speed, auth, storage, and workflow data | 001 |
+## Schema Decision
+- Milestone 2 keeps clinic contact fields and ROI/current-consent state denormalized on `cases`.
+- This is intentional MVP debt.
+- `audit_events` is the immutable history for the slice.
+- Future normalization is documented in `docs/decisions/002-first-slice.md`.
+
+## Workflow Checkpoint
+- `ROI Form 2` completion is the explicit trigger for `patient-onboarding` to `initial-todos`.
+- The transition must write both ROI timestamps, `roi_completed_at`, and the required audit events.
 
 ## Known Risks
-- No production app code has been implemented yet
-- No real database schema has been created yet
-- Hard gates are specified but not yet implemented in production code
-- The first milestone is not yet defined, which creates planning ambiguity
+- Milestone 2 keeps denormalized case fields intentionally
+- Invite delivery is manual and temporary in this milestone
+- Scope must stop at `initial-todos`
+- Patient onboarding, clinic referrals list, and Front Desk queue are still unimplemented
+- No automated workflow or RLS verification exists yet for the full Milestone 2 slice
 
-## Open Questions
-- What should the first implementation milestone be?
-- Should the project start with schema/auth foundation or with one concrete portal slice?
-- Which narrow product surface gives the best first validation of the system architecture?
-
-## Important Commands
-```bash
-# Start Codex
-codex
-
-# Check recent changes
-git log --oneline -10
-
-# Check current status in Codex
-/status
-
-# Inspect MCP servers in Codex
-/mcp
-
-# Compact context after milestone boundaries
-/compact
-```
-
-## Key File Locations
-| Purpose | Location |
-|---------|----------|
-| Stable rules | `AGENTS.md` |
-| Full spec | `docs/HANDOFF.md` |
-| Original requirements | `docs/WORKFLOW_SPEC.md` |
-| Current state | `docs/WORKING_MEMORY.md` |
-| Durable patterns | `docs/LEARNINGS.md` |
-| Active execution | `plans/ACTIVE_PLAN.md` |
-| Execution runbook | `docs/IMPLEMENT.md` |
-| ADRs | `docs/decisions/` |
-| Skills | `.agents/skills/` |
-| Agent configs | `agents/` |
-| Prototypes | `reference/` |
+## Next Step
+Review and approve step 5. Do not begin step 6 until this review is complete.

@@ -44,7 +44,7 @@ Last updated: 03/10/2026
 
 ## Workflow Engine
 
-*Patterns specific to stage transitions, hard gates, decisions.*
+- **Shared workflow/audit builders keep transitions consistent**: Centralizing Milestone 2 case-update payloads and audit-row builders in `src/lib/milestone2/workflow.ts` keeps server actions thin and reduces drift between referral creation and the ROI completion checkpoint.
 
 ---
 

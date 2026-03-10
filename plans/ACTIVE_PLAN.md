@@ -311,9 +311,9 @@ Prove the first real multi-portal handoff with real auth, real persistence, audi
 4. [x] Seed one clinic user and one Front Desk user in a configured Supabase project, using the committed organization seed data and `npm run seed:staff`
 5. [x] Implement clinic referral creation and the manual onboarding-link success state
 6. [x] Implement patient onboarding screens and the ROI completion checkpoint
-7. [ ] Implement the clinic read-only referrals list
-8. [ ] Implement the Front Desk read-only intake queue
-9. [ ] Add workflow, RLS, and smoke coverage
+7. [x] Implement the clinic read-only referrals list
+8. [x] Implement the Front Desk read-only intake queue
+9. [x] Add workflow, RLS, and smoke coverage
 
 ---
 

@@ -1,11 +1,4 @@
-export const patientAuditEventTypes = {
-  authLinkGenerated: "auth-link-generated",
-  onboardingAccessed: "onboarding-accessed",
-  referralCreated: "referral-created",
-  roiForm1Signed: "roi-form-1-signed",
-  roiForm2Signed: "roi-form-2-signed",
-  stageTransitioned: "stage-transitioned",
-} as const;
+export { milestone2AuditEventTypes as patientAuditEventTypes } from "@/lib/milestone2/workflow";
 
 export type PatientOnboardingStep =
   | "link-required"

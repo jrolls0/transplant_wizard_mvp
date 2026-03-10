@@ -2,7 +2,7 @@
 
 Durable patterns, gotchas, and things that work (or don't). Keep entries short.
 
-Last updated: 03/09/2026
+Last updated: 03/10/2026
 
 ---
 
@@ -50,4 +50,4 @@ Last updated: 03/09/2026
 
 ## Testing
 
-*Patterns specific to test setup, fixtures, coverage.*
+- **Split workflow coverage into pure builders plus live RLS/integration tests**: Milestone-sized server actions stay testable when stage-transition payloads and audit-row builders live in a small pure module, while one live Supabase suite covers the real RLS and checkpoint behavior without needing brittle browser-heavy E2E.

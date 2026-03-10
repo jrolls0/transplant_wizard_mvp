@@ -7,7 +7,7 @@ Milestone 2: Cross-Portal Intake Slice
 
 ## Status
 - Completed: Workspace hardening and Codex workspace setup
-- In progress: Milestone 2 step 8 is implemented and live-verified; step 9 has not started
+- In progress: Milestone 2 implementation is complete through step 9 and ready for final review
 - Blocked: None
 
 ## Completed
@@ -56,6 +56,12 @@ Milestone 2: Cross-Portal Intake Slice
   - `/center` renders a read-only intake queue with case number, patient name, clinic name, current stage, and ROI completed timestamp
   - The queue shows only live cases at `initial-todos`
   - Known live cases still at `patient-onboarding` do not appear in the queue, confirming the current RLS boundary from the browser-visible result
+- Step 9 automated coverage added:
+  - Local workflow tests cover referral creation defaults, referral audit ordering, ROI checkpoint guards, ROI checkpoint field updates, ROI checkpoint audit ordering, and onboarding-step progression
+  - Live Supabase integration tests cover clinic, patient, and Front Desk RLS boundaries plus one Milestone 2 smoke path
+- Step 9 was verified live:
+  - The smoke path creates a referral, confirms the case starts at `patient-onboarding`, blocks invalid advancement to `initial-todos`, completes onboarding, writes both ROI timestamps, writes `roi_completed_at`, advances the case, and verifies clinic plus Front Desk visibility
+  - The live RLS suite verifies clinic users only see their own org's cases, patient users only see their own case, Front Desk only sees `initial-todos`, and `patient-onboarding` cases do not appear in the Front Desk queue
 
 ## Locked Scope
 - Clinic referral submission surface
@@ -114,7 +120,7 @@ Milestone 2: Cross-Portal Intake Slice
 - Milestone 2 keeps denormalized case fields intentionally
 - Invite delivery is manual and temporary in this milestone
 - Scope must stop at `initial-todos`
-- No automated workflow or RLS verification exists yet for the full Milestone 2 slice
+- Milestone 2 still needs a final review pass before it is declared closed
 
 ## Next Step
-Review and approve step 8. Do not begin step 9 until this review is complete.
+Review Milestone 2 as a whole. Do not begin Milestone 3 until the final review is approved.

@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "seed:staff": "node --env-file=.env.local scripts/seed-staff-users.mjs"
+    "seed:staff": "node --env-file=.env.local scripts/seed-staff-users.mjs",
+    "test:unit": "node --import tsx --test --test-concurrency=1 tests/workflow/**/*.test.ts",
+    "test:live:m2": "node --env-file=.env.local --import tsx --test --test-concurrency=1 tests/live/**/*.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",
@@ -25,6 +27,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

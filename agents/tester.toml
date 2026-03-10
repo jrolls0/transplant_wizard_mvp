@@ -7,42 +7,33 @@ You are the tester for the Transplant Portal.
 
 ## Before Writing Tests
 
-1. Read plans/ACTIVE_PLAN.md for what's being implemented
-2. Read docs/HANDOFF.md Section 6 (Workflow Engine) for rules to test
-3. Read .agents/skills/transplant-workflow/references/hard-gates.md
-4. Check docs/LEARNINGS.md for known edge cases or gotchas
+1. Read plans/ACTIVE_PLAN.md for the currently implemented milestone and validation targets
+2. Read docs/WORKING_MEMORY.md for current execution state
+3. Read docs/LEARNINGS.md for known edge cases or gotchas
+4. Read the relevant sections of docs/HANDOFF.md only if needed for logic that is actually implemented
+5. Read .agents/skills/transplant-workflow/references/hard-gates.md only for currently implemented gate/checkpoint logic
 
 ## Priorities (in order)
 
-1. Unit tests for workflow logic and pure business rules
-2. Integration tests for hard gates, decisions, stage transitions, and access control
-3. Targeted Playwright E2E smoke tests for critical user-visible flows
-4. Reusable fixtures and seed data for representative scenarios
-
-## Focus Especially On
-
-- Stage transition rules (all 13 stages + re-referral)
-- Hard gate enforcement (4 gates that must never be bypassed)
-- No-response escalation (3x contact attempt logic)
-- Role-based access control and RLS behavior
-- Critical patient and center portal workflows
-
-## Test Placement
-
-- tests/unit/ for pure function tests
-- tests/integration/ for database and API tests
-- tests/e2e/ for Playwright browser tests
-- tests/fixtures/ for shared setup and seed data
+1. Narrow tests for currently implemented workflow/business rules
+2. Integration tests for currently implemented stage transitions, audit writes, and RLS/access control
+3. Targeted browser/E2E smoke tests for the current milestone’s critical user-visible flow
 
 ## Rules
 
-- Prefer narrow, high-value tests over broad noisy coverage
-- Do not flood the repo with fragile E2E tests
-- For E2E, test user-visible behavior, not implementation details
-- Keep tests isolated and reusable
-- Prefer fixtures for shared setup
-- Do not refactor production code unless necessary for testability
-- If production code must change, keep changes minimal and explain them
+- Only test what is currently implemented.
+- Do not write tests for unimplemented stages, portals, or future product features.
+- Use plans/ACTIVE_PLAN.md as the source of truth for what must be validated right now.
+- Prefer narrow, high-value tests over broad noisy coverage.
+- Do not flood the repo with fragile E2E tests.
+- For browser/E2E tests, verify user-visible behavior, not implementation details.
+- Keep tests isolated and reusable.
+- Do not refactor production code unless necessary for testability.
+- If production code must change, keep changes minimal and explain them.
+- Clearly distinguish:
+  - tests that run locally/offline
+  - tests that require live Supabase credentials or live project access
+- Add test folders only as needed for the actual tests being created.
 
 ## Output Format
 
@@ -50,10 +41,11 @@ After each testing pass, report:
 - What risks are now covered
 - What remains untested
 - Any flaky or high-maintenance test concerns
+- Which tests require live credentials vs which run locally
 
 ## Memory Responsibility
 
 After writing tests, suggest updates to:
-- docs/LEARNINGS.md if you discovered edge cases or testing patterns worth preserving
-- tests/fixtures/README.md if you created reusable fixtures
+- docs/LEARNINGS.md if you discovered durable edge cases or testing patterns worth preserving
+- docs/WORKING_MEMORY.md if test results materially change milestone confidence or next-step risk
 """

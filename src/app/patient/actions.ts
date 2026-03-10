@@ -4,6 +4,12 @@ import { redirect } from "next/navigation";
 
 import { normalizePortalType } from "@/lib/auth/portal";
 import {
+  assertCanCompleteRoiCheckpoint,
+  buildRoiCheckpointAuditRows,
+  buildRoiCheckpointCaseUpdate,
+  buildRoiForm1AuditRow,
+} from "@/lib/milestone2/workflow";
+import {
   getPatientOnboardingStep,
   patientAuditEventTypes,
   type PatientOnboardingContext,
@@ -174,22 +180,14 @@ async function completePatientOnboardingCheckpoint(
     throw currentCaseError ?? new Error("The current case could not be loaded.");
   }
 
-  if (currentCase.stage !== "patient-onboarding") {
-    throw new Error("This case is no longer in patient onboarding.");
-  }
-
-  if (!currentCase.roi_form_1_signed_at) {
-    throw new Error("ROI Form 1 must be completed before ROI Form 2.");
-  }
+  assertCanCompleteRoiCheckpoint({
+    roiForm1SignedAt: currentCase.roi_form_1_signed_at,
+    stage: currentCase.stage,
+  });
 
   const { error: updateError } = await adminSupabase
     .from("cases")
-    .update({
-      roi_completed_at: completedAt,
-      roi_form_2_signed_at: completedAt,
-      stage: "initial-todos",
-      stage_entered_at: completedAt,
-    })
+    .update(buildRoiCheckpointCaseUpdate(completedAt))
     .eq("id", caseId)
     .eq("stage", "patient-onboarding")
     .is("roi_form_2_signed_at", null);
@@ -198,33 +196,15 @@ async function completePatientOnboardingCheckpoint(
     throw updateError;
   }
 
-  const { error: auditError } = await adminSupabase.from("audit_events").insert([
-    {
-      actor_id: sessionUserId,
-      actor_type: "patient",
-      case_id: caseId,
-      event_type: patientAuditEventTypes.roiForm2Signed,
-      metadata: {
-        case_number: currentCase.case_number,
-        patient_id: patientId,
-        signed_at: completedAt,
-      },
-    },
-    {
-      actor_id: sessionUserId,
-      actor_type: "patient",
-      case_id: caseId,
-      event_type: patientAuditEventTypes.stageTransitioned,
-      metadata: {
-        case_number: currentCase.case_number,
-        checkpoint: "roi-complete",
-        from_stage: "patient-onboarding",
-        patient_id: patientId,
-        to_stage: "initial-todos",
-        transitioned_at: completedAt,
-      },
-    },
-  ]);
+  const { error: auditError } = await adminSupabase.from("audit_events").insert(
+    buildRoiCheckpointAuditRows({
+      caseId,
+      caseNumber: currentCase.case_number,
+      completedAt,
+      patientId,
+      sessionUserId,
+    }),
+  );
 
   if (auditError) {
     throw auditError;
@@ -336,17 +316,17 @@ export async function signPatientRoiForm1(formData: FormData) {
       throw updateError;
     }
 
-    const { error: auditError } = await adminSupabase.from("audit_events").insert({
-      actor_id: sessionUserId,
-      actor_type: "patient",
-      case_id: context.currentCase.id,
-      event_type: patientAuditEventTypes.roiForm1Signed,
-      metadata: {
-        case_number: context.currentCase.caseNumber,
-        patient_id: context.patient.id,
-        signed_at: signedAt,
-      },
-    });
+    const { error: auditError } = await adminSupabase
+      .from("audit_events")
+      .insert(
+        buildRoiForm1AuditRow({
+          caseId: context.currentCase.id,
+          caseNumber: context.currentCase.caseNumber,
+          patientId: context.patient.id,
+          sessionUserId,
+          signedAt,
+        }),
+      );
 
     if (auditError) {
       throw auditError;

@@ -5,6 +5,11 @@ import { headers } from "next/headers";
 
 import type { ClinicReferralListItem } from "@/lib/clinic/referrals";
 import { normalizePortalType } from "@/lib/auth/portal";
+import {
+  buildReferralAuditRows,
+  buildReferralCaseInsert,
+  type ReferralFormValues,
+} from "@/lib/milestone2/workflow";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { hasSupabaseServiceRoleEnv } from "@/lib/supabase/env";
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
@@ -22,8 +27,6 @@ const requiredFieldNames = [
 ] as const;
 
 type RequiredFieldName = (typeof requiredFieldNames)[number];
-
-type ReferralFormValues = Record<RequiredFieldName, string>;
 
 export type ClinicReferralActionState = {
   caseNumber: string | null;
@@ -58,7 +61,7 @@ function validateReferralForm(formData: FormData) {
     nephrologistContactEmail: normalizeFieldValue(
       formData.get("nephrologistContactEmail"),
     ).toLowerCase(),
-  } satisfies ReferralFormValues;
+  } satisfies Record<RequiredFieldName, string>;
 
   const errors: Partial<Record<RequiredFieldName, string>> = {};
 
@@ -310,7 +313,15 @@ export async function submitClinicReferral(
 
   try {
     const redirectTo = await buildPatientRedirectTo();
-    const patientAuth = await ensurePatientAuthUser(adminSupabase, values, redirectTo);
+    const workflowValues = {
+      ...values,
+      patientPreferredLanguage: values.patientPreferredLanguage as "en" | "es",
+    } satisfies ReferralFormValues;
+    const patientAuth = await ensurePatientAuthUser(
+      adminSupabase,
+      workflowValues,
+      redirectTo,
+    );
 
     const { data: patient, error: patientError } = await adminSupabase
       .from("patients")
@@ -341,17 +352,15 @@ export async function submitClinicReferral(
       .from("cases")
       .insert({
         case_number: caseNumber,
-        dusw_contact_email: values.duswContactEmail,
-        dusw_contact_name: values.duswContactName,
-        email_consent: false,
-        invite_link_generated_at: inviteGeneratedAt,
-        nephrologist_contact_email: values.nephrologistContactEmail,
-        nephrologist_contact_name: values.nephrologistContactName,
-        patient_id: patient.id,
-        referring_clinic_id: profile.organization_id,
-        sms_consent: false,
-        stage: "patient-onboarding",
-        submitted_by_role: profile.role,
+        ...buildReferralCaseInsert({
+          inviteGeneratedAt,
+          patientId: patient.id,
+          profile: {
+            organizationId: profile.organization_id,
+            role: profile.role,
+          },
+          values: workflowValues,
+        }),
       })
       .select("id, created_at, stage, stage_entered_at")
       .single();
@@ -360,31 +369,13 @@ export async function submitClinicReferral(
       throw caseError ?? new Error("Unable to create the case record.");
     }
 
-    const auditRows = [
-      {
-        actor_id: user.id,
-        actor_type: "staff",
-        case_id: createdCase.id,
-        event_type: "referral-created",
-        metadata: {
-          case_number: caseNumber,
-          patient_id: patient.id,
-          stage: "patient-onboarding",
-        },
-      },
-      {
-        actor_id: user.id,
-        actor_type: "staff",
-        case_id: createdCase.id,
-        event_type: "auth-link-generated",
-        metadata: {
-          case_number: caseNumber,
-          patient_id: patient.id,
-          redirect_to: redirectTo,
-          verification_type: "magiclink",
-        },
-      },
-    ];
+    const auditRows = buildReferralAuditRows({
+      actorId: user.id,
+      caseId: createdCase.id,
+      caseNumber,
+      patientId: patient.id,
+      redirectTo,
+    });
 
     const { error: auditError } = await adminSupabase
       .from("audit_events")

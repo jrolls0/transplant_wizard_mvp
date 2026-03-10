@@ -230,15 +230,30 @@ Prove the first real multi-portal handoff with real auth, real persistence, audi
     - the queue shows case number, patient name, clinic name, current stage, and ROI completed timestamp
     - the visible queue count matches the live `initial-todos` case count
     - known live `patient-onboarding` cases do not appear in the queue
+  - Step-9 automated coverage added for Milestone 2:
+    - local workflow tests for referral creation defaults, ROI checkpoint guards, audit-row ordering, and onboarding-step progression
+    - live Supabase integration coverage for clinic, patient, and Front Desk RLS boundaries
+    - live Milestone 2 smoke coverage for referral creation, onboarding completion, `initial-todos` advancement, clinic visibility, and Front Desk queue visibility
+  - Live step-9 verification:
+    - the smoke test proves a case starts at `patient-onboarding`, cannot jump to `initial-todos` before ROI completion, then advances correctly on the ROI checkpoint
+    - the live database row shows `roi_form_1_signed_at`, `roi_form_2_signed_at`, `roi_completed_at`, and `stage_entered_at`
+    - the required audit events are present for the full slice
+    - clinic users only see their own org's cases
+    - patient users only see their own case
+    - Front Desk only sees `initial-todos` cases
+    - `patient-onboarding` cases do not appear in the Front Desk queue
 
 ### Validation
 - Automated workflow coverage for `new-referral` to `patient-onboarding` to `initial-todos`
 - RLS verification for clinic, patient, and Front Desk access
 - One end-to-end smoke path covering referral submission, onboarding, ROI completion, clinic list update, and Front Desk queue visibility
 - Build and typecheck
-- Live verification completed through step 6:
-- Live verification completed through step 7:
-- Live verification completed through step 8:
+- Local/offline verification:
+  - `npm run test:unit`
+  - `npm run typecheck`
+  - `npm run lint`
+  - `npm run build`
+- Live verification completed through step 9:
   - clinic login
   - referral submission
   - patient magic-link generation
@@ -248,13 +263,14 @@ Prove the first real multi-portal handoff with real auth, real persistence, audi
   - clinic referrals/status list rendering real case stages for the clinic org
   - Front Desk login and read-only intake queue
   - browser-visible RLS boundary check for `initial-todos` vs `patient-onboarding`
+  - automated live Supabase smoke path and RLS tests via `npm run test:live:m2`
 
 ### Risks
 - Bootstrap creep
 - Auth creep
 - Workflow creep
 - Schema creep
-- Step 9 remains unverified and unimplemented
+- Milestone 2 is implemented; final review still needs to confirm no scope drift before declaring the milestone closed
 
 ### Explicit Defer List
 - Real email invite sending
